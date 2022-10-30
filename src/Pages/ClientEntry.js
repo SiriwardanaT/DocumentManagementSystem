@@ -1,111 +1,66 @@
-import '../../src/App.css';
-import { PlusOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
-import { Space, Table, Tag,Modal,Button, Col, DatePicker, Drawer, Form, Input, Row, Select} from 'antd';
+import "../../src/App.css";
+import { PlusOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import ClentEntryList from "../Components/ClientEntry/ClientEntryList";
+import {
+  Space,
+  Button,
+  Col,
+  Drawer,
+  message,
+  Form,
+  Input,
+  Row,
+  Select,
+} from "antd";
 function ClientEntry() {
-    const { Option } = Select;
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [open, setOpen] = useState(false);
-    const columns = [
-        {
-          title: 'Name',
-          dataIndex: 'name',
-          key: 'name',
-          render: (text) => <a>{text}</a>,
-        },
-        {
-          title: 'Age',
-          dataIndex: 'age',
-          key: 'age',
-        },
-        {
-          title: 'Address',
-          dataIndex: 'address',
-          key: 'address',
-        },
-        {
-          title: 'Tags',
-          key: 'tags',
-          dataIndex: 'tags',
-          render: (_, { tags }) => (
-            
-            <>
-              {tags.map((tag) => {
-                let color = tag.length > 5 ? 'geekblue' : 'green';
-                if (tag === 'loser') {
-                  color = 'volcano';
-                }
-                return (
-                  <Tag color={color} key={tag}>
-                    {tag.toUpperCase()}
-                  </Tag>
-                );
-              })}
-            </>
-          ),
-        },
-        {
-          title: 'Action',
-          key: 'action',
-          render: () => (
-            <Space size="middle">
-              <a>Update</a>
-              <a onClick={()=>{showModal()}}>Delete</a>
-            </Space>
-          ),
-        }
-      ];
-      const data = [
-        {
-          key: '1',
-          name: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '2',
-          name: 'Jim Green',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-          tags: ['loser'],
-        },
-        {
-          key: '3',
-          name: 'Joe Black',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-          tags: ['cool', 'teacher'],
-        },
-      ];
+  const { Option } = Select;
+  const [form] = Form.useForm();
+  const [open, setOpen] = useState(false);
 
-    
-      const showModal = () => {
-        setIsModalOpen(true);
-      };
-    
-      const handleOk = () => {
-        setIsModalOpen(false);
-      };
-    
-      const handleCancel = () => {
-        setIsModalOpen(false);
-      };
-     
-      const showDrawer = () => {
-        setOpen(true);
-      };
-      const onClose = () => {
-        setOpen(false);
+
+  const clientName = Form.useWatch('clientName', form)
+  const CompanyName = Form.useWatch('CompanyName', form)
+  const owner = Form.useWatch('owner', form)
+  const documentApproved = Form.useWatch('documentApproved', form)
+  const sector = Form.useWatch('sector', form)
+  const description = Form.useWatch('description', form)
+
+  const showDrawer = () => {
+    setOpen(true);
   };
-    return ( <div className="App" style={{paddingTop:'10px'}}>
-       <div className='titleName'><h1>Client Entry</h1></div>
-       <div>
-            <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-                New account
-            </Button>
-        </div>
-        <Drawer
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const onFinish = () => {
+
+    const payload = {
+      clientName: clientName,
+      CompanyName: CompanyName,
+      owner: owner,
+      documentApproved: documentApproved,
+      sector: sector,
+      description: description
+    }
+    //api end point
+
+  }
+
+
+
+  return (
+    <div className="App" style={{ paddingTop: "10px" }}>
+      <div className="titleName">
+        <h1>Client Entry</h1>
+      </div>
+      <div>
+        <Button type="primary" style={{ position: "relative", left: '44%' }} onClick={showDrawer} icon={<PlusOutlined />}>
+          New account
+        </Button>
+      </div>
+      <Drawer
         title="Create a New Client Entry"
         width={720}
         onClose={onClose}
@@ -113,26 +68,17 @@ function ClientEntry() {
         bodyStyle={{
           paddingBottom: 80,
         }}
-        extra={
-          <Space>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClose} type="primary">
-              Save
-            </Button>
-          </Space>
-        }
       >
-        <Form layout="vertical">
+        <Form form={form} layout="vertical" autoComplete="off" onFinish={onFinish}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="name"
-                label="Name"
+                name="clientName"
+                label="Client Name"
                 rules={[
                   {
                     required: true,
-                    message: 'Please enter user name',
-                  },
+                  }
                 ]}
               >
                 <Input placeholder="Please enter user name" />
@@ -140,23 +86,16 @@ function ClientEntry() {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="url"
-                label="Url"
+                name="CompanyName"
+                label="Company Name"
                 rules={[
                   {
                     required: true,
-                    message: 'Please enter url',
+                    message: "Please enter Company Name",
                   },
                 ]}
               >
-                <Input
-                  style={{
-                    width: '100%',
-                  }}
-                  addonBefore="http://"
-                  addonAfter=".com"
-                  placeholder="Please enter url"
-                />
+                <Input placeholder="Please enter Company Name" />
               </Form.Item>
             </Col>
           </Row>
@@ -167,31 +106,30 @@ function ClientEntry() {
                 label="Owner"
                 rules={[
                   {
-                    required: true,
-                    message: 'Please select an owner',
+                    required: true
                   },
                 ]}
               >
                 <Select placeholder="Please select an owner">
-                  <Option value="xiao">Xiaoxiao Fu</Option>
-                  <Option value="mao">Maomao Zhou</Option>
+                  <Option value="xiao">Member 1</Option>
+                  <Option value="mao">Member 2</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="type"
-                label="Type"
+                name="sector"
+                label="Sector"
                 rules={[
                   {
                     required: true,
-                    message: 'Please choose the type',
+                    message: "Please choose the type",
                   },
                 ]}
               >
                 <Select placeholder="Please choose the type">
-                  <Option value="private">Private</Option>
-                  <Option value="public">Public</Option>
+                  <Option value="0">Private</Option>
+                  <Option value="1">Goverment</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -199,40 +137,22 @@ function ClientEntry() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="approver"
-                label="Approver"
+                name="documentApproved"
+                label="Document Approve"
                 rules={[
                   {
                     required: true,
-                    message: 'Please choose the approver',
+                    message: "Please choose the approver",
                   },
                 ]}
               >
-                <Select placeholder="Please choose the approver">
-                  <Option value="jack">Jack Ma</Option>
-                  <Option value="tom">Tom Liu</Option>
+                <Select placeholder="Please choose the document approve status ">
+                  <Option value="1">Yes</Option>
+                  <Option value="0">No</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="dateTime"
-                label="DateTime"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please choose the dateTime',
-                  },
-                ]}
-              >
-                <DatePicker.RangePicker
-                  style={{
-                    width: '100%',
-                  }}
-                  getPopupContainer={(trigger) => trigger.parentElement}
-                />
-              </Form.Item>
-            </Col>
+
           </Row>
           <Row gutter={16}>
             <Col span={24}>
@@ -242,24 +162,31 @@ function ClientEntry() {
                 rules={[
                   {
                     required: true,
-                    message: 'please enter url description',
+                    message: "please enter url description",
                   },
                 ]}
               >
-                <Input.TextArea rows={4} placeholder="please enter url description" />
+                <Input.TextArea
+                  rows={4}
+                  placeholder="please enter url description"
+                />
               </Form.Item>
             </Col>
           </Row>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Space>
+          </Form.Item>
         </Form>
       </Drawer>
-        <div style={{margin:'10px'}}>
-            <Table columns={columns} dataSource={data} />
-        </div>
-      
-       <Modal title="Delete Confirmation" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <h3>Are you sure to delete this record</h3>
-       </Modal>
-    </div>);
+
+      {/* Table view component */}
+      <ClentEntryList />
+    </div>
+  );
 }
 
 export default ClientEntry;
