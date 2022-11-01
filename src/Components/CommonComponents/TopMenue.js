@@ -27,7 +27,7 @@ function TopMenue() {
             <Menu.Item onClick={()=>{navigate('/finacial')}} icon={<MailOutlined />}>
                 Finacial Management
             </Menu.Item>
-            <Menu.Item  icon={<MailOutlined />}>
+            <Menu.Item onClick={()=>{navigate('/login')}} icon={<MailOutlined />}>
                 Admin Login
             </Menu.Item>
             </Menu>

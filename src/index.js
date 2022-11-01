@@ -20,6 +20,7 @@ import ClientEntry from '../src/Pages/ClientEntry'
 import ProjectEntry from '../src/Pages/ProjectEntry'
 import Task from '../src/Pages/Task'
 import Finacial  from './Pages/Finacial';
+import Login from './Pages/Login';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -34,6 +35,7 @@ root.render(
         <Route path="/projectentry" element={<ProjectEntry />}/>
         <Route path="/task" element={<Task />}/>
         <Route path="/finacial" element={<Finacial />}/>
+        <Route path="/login" element={<Login />}/>
       </Routes>
   </BrowserRouter>,
   </React.StrictMode>
