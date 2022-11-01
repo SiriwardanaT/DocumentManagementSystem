@@ -1,14 +1,18 @@
 import '../../App.css';
 import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, Modal ,message} from 'antd';
+import { Space, Table, Tag, Modal,message } from 'antd';
+import client from '../../Service/Client'
 import axios from 'axios';
-function ClentEntryList({handleClick}) {
+
+
+function ProjectList({handleClick}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setclents] = useState([]);
   const [sessionid , setSessionId] = useState([]);
+  var clientData = [];
   // Data retrive api call from backend
   useEffect(() => {
-    axios.get('http://localhost:3001/client').then((res)=>{
+     axios.get('http://localhost:3001/project').then((res)=>{
         setclents(res.data)
      }).catch((err)=>{
         console.log(err);
@@ -17,25 +21,33 @@ function ClentEntryList({handleClick}) {
   
   const columns = [
     {
-      title: 'clientName',
-      dataIndex: 'clientName',
+      title: 'projectTitle',
+      dataIndex: 'projectTitle',
       render: (text) => <a>{text}</a>,
     },
     {
-      title: 'CompanyName',
-      dataIndex: 'CompanyName',
+      title: 'client',
+      dataIndex: 'client',
     },
     {
-      title: 'owner',
-      dataIndex: 'owner',
+      title: 'documentOwner',
+      dataIndex: 'documentOwner',
     },
     {
       title:"documentApproved",
       dataIndex:"documentApproved"
     },
     {
+      title:"industry",
+      dataIndex:"industry"
+    },
+    {
+      title:"description",
+      dataIndex:"description"
+    },
+    {
       title: 'Action',
-      key: 'action',
+      key: 'Action',
       render: (_, record) => (
         <Space size="middle">
           <a onClick={event => handleClick(record)}>Update</a>
@@ -45,16 +57,15 @@ function ClentEntryList({handleClick}) {
     }
   ];
 
-
-  const showModal = (recId) => {
-    setSessionId(recId);
+  const showModal = (rec) => {
+    setSessionId(rec)
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    axios.delete('http://localhost:3001/client/'+sessionid).then((res)=>{
+    axios.delete('http://localhost:3001/project/'+sessionid).then((res)=>{
       res.status == 200 ? message.info("Client deleted Success") :message.success("Something Went wrong")
-      window.location = "/cliententry"
+      window.location = "/projectentry"
     }).catch((err)=>{
       message.error("Virtuza Server Error "+err)
     })
@@ -75,4 +86,4 @@ function ClentEntryList({handleClick}) {
   );
 }
 
-export default ClentEntryList;
+export default ProjectList;

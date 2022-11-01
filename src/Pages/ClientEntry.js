@@ -13,11 +13,12 @@ import {
   Row,
   Select,
 } from "antd";
+import axios from "axios";
 function ClientEntry() {
   const { Option } = Select;
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
-
+  const [session,setSession] = useState("");
 
   const clientName = Form.useWatch('clientName', form)
   const CompanyName = Form.useWatch('CompanyName', form)
@@ -26,7 +27,16 @@ function ClientEntry() {
   const sector = Form.useWatch('sector', form)
   const description = Form.useWatch('description', form)
 
-  const showDrawer = () => {
+  const showDrawer = (record) => {
+    setSession(record._id)
+    form.setFieldsValue({
+      clientName: record.clientName,
+      CompanyName: record.CompanyName,
+      owner: record.owner,
+      documentApproved: record.documentApproved,
+      sector: record.sector,
+      description: record.description
+    });
     setOpen(true);
   };
 
@@ -35,7 +45,6 @@ function ClientEntry() {
   };
 
   const onFinish = () => {
-
     const payload = {
       clientName: clientName,
       CompanyName: CompanyName,
@@ -45,10 +54,23 @@ function ClientEntry() {
       description: description
     }
     //api end point
-
+    if(session != null){
+        axios.put('http://localhost:3001/client/'+session,payload).then((res)=>{
+          res.status == 200  ? message.success("Client Deleted Success") :message.success("Something Went wrong")
+          window.location = "/cliententry"
+        }).catch((err)=>{
+          message.error("Virtuza Server Error "+err)
+        })
+    }
+    else{
+      axios.post('http://localhost:3001/client',payload).then((res)=>{
+          res.status == 201  ? message.success("Client Created Success") :message.success("Something Went wrong") 
+          window.location = "/cliententry"
+      }).catch((err)=>{
+          message.error("Virtuza Server Error "+err)
+      })
+    }
   }
-
-
 
   return (
     <div className="App" style={{ paddingTop: "10px" }}>
@@ -184,7 +206,7 @@ function ClientEntry() {
       </Drawer>
 
       {/* Table view component */}
-      <ClentEntryList />
+      <ClentEntryList handleClick={showDrawer} />
     </div>
   );
 }

@@ -1,12 +1,17 @@
-import { Menu} from 'antd';
+import { Menu,Image} from 'antd';
 import { MailOutlined, FolderAddOutlined, FundProjectionScreenOutlined ,UsergroupAddOutlined} from '@ant-design/icons';
 import { useNavigate,Link } from 'react-router-dom';
+import img from '../../Assest/Logo.jpg';
+
+
 function TopMenue() {
     const navigate = useNavigate();
     return ( 
         <div className="App">
-            <Menu mode="horizontal" defaultSelectedKeys={['mail']}>
-           
+            <Menu mode="horizontal" defaultSelectedKeys={['mail']} style={{backgroundColor:"#003366",color:"white"}}>
+            <div>
+                <Image src={img} style={{width:'60px'}}></Image>
+             </div>
             <Menu.Item onClick={()=>{navigate('/')}} icon={<UsergroupAddOutlined />}>
                 Dashboard
             </Menu.Item>
