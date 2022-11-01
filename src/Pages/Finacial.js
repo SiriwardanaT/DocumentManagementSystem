@@ -3,31 +3,29 @@ import "../../src/App.css";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import FinancialList from "../Components/FinancialEntry/FinancialList";
 import {
   Space,
   Table,
-  Tag,
-  Modal,
   Button,
   Col,
   DatePicker,
+  message,
   Drawer,
   Form,
   Input,
   Row,
-  Select,
 } from "antd";
 function Finacial() {
-
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [payments, setPayments] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [session,setSession] = useState("");
 
-  useEffect(() => {
-    getAllPaymentData();
-  });
+
 
   const sprint = Form.useWatch("sprint", form);
   const projectId = Form.useWatch("projectId", form);
@@ -36,151 +34,62 @@ function Finacial() {
   const paymentForSprint = Form.useWatch("paymentForSprint", form);
   const paymentDate = Form.useWatch("paymentDate", form);
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
 
-  const handleOk = async () => {
-    await axios
-      .get("http://localhost:5000/payment/getPayments")
-      .then((res) => {
-        setPayments(res.data);
-      })
-      .catch((err) => {
-        alert(err);
-      });
-  };
 
-  const deletePayment = async (key, e) => {
-    console.log("key", key);
-    await axios
-      .delete(`http://localhost:5000/payment/deletePayment/${key}`)
-      .then((res) => {
-        alert("deleted");
-      })
-      .catch((err) => {
-        alert(err);
-      });
+  const showDrawer = (record) => {
+    setSession(record._id)
+    form.setFieldsValue({
+           projectId: record.projectId,
+            projectName: record.projectName,
+            cilentName: record.cilentName,
+            sprint:record.sprint,
+            paymentForSprint: record.paymentForSprint,
+            paymentDate: record.paymentDate,
+    });
+    setOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  const showDrawer = (key, e) => {
-    getData(key, e);
-    setOpen(true);
-  };
+ 
   const onClose = () => {
     setOpen(false);
   };
 
-  const getData=async(key,e)=>{
-    await axios
-    .get(`http://localhost:5000/payment/getDataFor/${key}`)
-    .then((res) => {
-     const {sprint} = res;
-    })
-    .catch((err) => {
-      alert(err);
-    });
-  }
-
-  const columns = [
-    {
-      title: "project Id",
-      dataIndex: "projectId",
-      key: "projectId",
-    },
-    {
-      title: "project Name",
-      dataIndex: "projectName",
-      key: "projectName",
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "cilent Name",
-      dataIndex: "cilentName",
-      key: "cilentName",
-    },
-    {
-      title: "Sprint Number",
-      dataIndex: "sprint",
-      key: "sprint",
-    },
-    {
-      title: "Payment Amount",
-      dataIndex: "paymentForSprint",
-      key: "paymentForSprint",
-    },
-    {
-        title: "Date",
-        dataIndex: "paymentDate",
-        key: "paymentDate",
-      },
-
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <a
-            onClick={(e) => {
-               setIsEdit(true);
-              showDrawer(record._id, e);
-            }}
-          >
-            Update
-          </a>
-          <a
-            onClick={(e) => {
-              console.log("record", record);
-              console.log("id", record._id);
-
-              deletePayment(record._id, e);
-            }}
-          >
-            Delete
-          </a>
-        </Space>
-      ),
-    },
-  ];
-
-  const getAllPaymentData = async (req, res) => {
-    await axios
-      .get("http://localhost:5000/payment/getPayments")
-      .then((res) => {
-        // console.log("res",res)
-        setPayments(res.data);
-      })
-      .catch((err) => {
-        alert(err);
-      });
-  };
+  
 
   const onFinish = async (e) => {
     console.log("check");
     // e.preventDefault();
 
-    const newTask = {
-        projectId,
-        projectName,
-        cilentName,
-        sprint,
-        paymentForSprint,
-        paymentDate
+    const newPayment = {
+        projectId:projectId,
+        projectName:projectName,
+        cilentName: cilentName,
+        sprint:sprint,
+        paymentForSprint:paymentForSprint,
+        paymentDate:paymentDate
     };
 
-    await axios
-      .post("http://localhost:5000/payment/createPayments", newTask)
-      .then(() => {
-        alert("item added to task entry");
+     //api end point
+     if(session != null){
+      axios.put('http://localhost:3001/payment/updatePayment/'+session,newPayment).then((res)=>{
+        res.status == 200  ? message.success("Client Deleted Success") :message.success("Something Went wrong")
+        window.location = "/finacial"
+      }).catch((err)=>{
+        message.error("Virtuza Server Error "+err)
       })
-      .catch((err) => {
-        alert(err);
-      });
+  }
+  else{
+    axios.post('http://localhost:3001/payment/createPayments',newPayment).then((res)=>{
+        res.status == 201  ? message.success("Client Created Success") :message.success("Something Went wrong") 
+        window.location = "/finacial"
+    }).catch((err)=>{
+        message.error("Virtuza Server Error "+err)
+    })
+  }
   };
   return (
     <div className="App" style={{ paddingTop: "10px" }}>
@@ -193,7 +102,7 @@ function Finacial() {
         </Button>
       </div>
       <Drawer
-        title={isEdit ? 'Update a Payment Entry' : 'Create a New Payment Entry'}
+        title='Create a New Payment Entry'
         width={720}
         onClose={onClose}
         open={open}
@@ -315,7 +224,7 @@ function Finacial() {
                   },
                 ]}
               >
-                  <DatePicker  />
+                  <Input  />
               </Form.Item>
             </Col>
           </Row>
@@ -328,18 +237,9 @@ function Finacial() {
           </Form.Item>
         </Form>
       </Drawer>
-      <div style={{ margin: "10px" }}>
-        <Table columns={columns} dataSource={payments} />
-      </div>
-
-      {/* <Modal
-        title="Delete Confirmation"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <h3>Are you sure to delete this record</h3>
-      </Modal> */}
+     <FinancialList handleClick={showDrawer}/>
+ 
+    
     </div>
   );
 }

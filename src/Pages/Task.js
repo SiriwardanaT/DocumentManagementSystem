@@ -3,29 +3,28 @@ import "../../src/App.css";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import TaskList from "../Components/TaskEntry/TaskList";
 import {
   Space,
   Table,
-  Tag,
-  Modal,
   Button,
   Col,
   DatePicker,
+  message,
+  Select,
   Drawer,
   Form,
   Input,
   Row,
-  Select,
 } from "antd";
 function Task() {
   const { Option } = Select;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
-  const [tasks, setTasks] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
-  const [data,setData]=useState({});
-  const [sprint1,setSprint1]= useState(0);
+  const [session,setSession] = useState("");
 
 
 
@@ -34,222 +33,62 @@ function Task() {
   const taskDescription = Form.useWatch("taskDescription", form);
   const assignee = Form.useWatch("assignee", form);
   const anyOtherConcerns = Form.useWatch("anyOtherConcerns", form);
-  let response;
 
-  useEffect(() => {
-    getAllData();
-  });
+ 
+  
 
-  useEffect(()=>{
-   console.log("data",data)
-  },[data])
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  // const handleOk = async () => {
-  //   await axios
-  //     .get("http://localhost:5000/task/getTasks")
-  //     .then((res) => {
-  //       setTasks(res.data);
-  //     })
-  //     .catch((err) => {
-  //       alert(err);
-  //     });
-  // };
-
-  const deleteTask = async (key, e) => {
-    console.log("key", key);
-    await axios
-      .delete(`http://localhost:5000/task/deleteTasks/${key}`)
-      .then((res) => {
-        alert("deleted");
-      })
-      .catch((err) => {
-        alert(err);
-      });
+  const showDrawer = (record) => {
+    setSession(record._id)
+    form.setFieldsValue({
+          sprint: record.sprint,
+          useCaseId: record.useCaseId,
+          taskDescription: record.taskDescription,
+          assignee: record.assignee,
+          anyOtherConcerns: record.anyOtherConcerns,
+    });
+    setOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  const showDrawer = (key, e) => {
-    console.log("isEdit",isEdit);
-    if(isEdit){
-      console.log("Aaa")
-      getData(key, e);
-      setOpen(true);
-    }else{
-      console.log("bbbb")
-      setOpen(true)
-    }
-   
-   
-  };
+ 
   const onClose = () => {
     setOpen(false);
   };
 
-  const getData=async(key,e)=>{
-    console.log("awaaa")
-    await axios
-    .get(`http://localhost:5000/task/getDataFor/${key}`)
-    .then((res) => {
-    console.log("res111",res.data)
   
-   
-      form.setFieldsValue({
-        sprint: res.data.sprint,
-        useCaseId: res.data.useCaseId,
-        taskDescription: res.data.taskDescription,
-        assignee:res.data.assignee,
-        anyOtherConcerns: res.data.anyOtherConcerns,
-       
-      });
-   
-      const EditData=async(key)=>{
-        const updateTask = {
-          sprint,
-          useCaseId,
-          taskDescription,
-          assignee,
-          anyOtherConcerns,
-        };
-  
-        await axios
-        .post(`http://localhost:5000/task/updateTasks/${key}`, updateTask)
-        .then(() => {
-          alert("item added to task entry");
-        })
-        .catch((err) => {
-          alert(err);
-        });
-
-      };
-  
-     
-    })
-    .catch((err) => {
-      alert(err);
-    });
-  }
-
-  const updateData=()=>{
-    EditData();
-  }
-
-  const columns = [
-    
-    {
-      title: "Sprint Number",
-      dataIndex: "sprint",
-      key: "sprint",
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Usecase number",
-      dataIndex: "useCaseId",
-      key: "useCaseId",
-    },
-    {
-      title: "Assignee",
-      dataIndex: "assignee",
-      key: "assignee",
-    },
-    {
-      title: "Task",
-      dataIndex: "taskDescription",
-      key:  "taskDescription",
-    },
-    {
-      title: "Other Concerns",
-      dataIndex: "anyOtherConcerns",
-      key:  "anyOtherConcerns",
-    },
-
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <a
-            onClick={(e) => {
-              setIsEdit(true);
-              showDrawer(record._id, e);
-             
-             
-            
-            }}
-          >
-            Update
-          </a>
-          <a
-            onClick={(e) => {
-              console.log("record", record);
-              console.log("id", record._id);
-
-              deleteTask(record._id, e);
-            }}
-          >
-            Delete
-          </a>
-        </Space>
-      ),
-    },
-  ];
-
-  const getAllData = async (req, res) => {
-    await axios
-      .get("http://localhost:5000/task/getTasks")
-      .then((res) => {
-        setTasks(res.data);
-      })
-      .catch((err) => {
-        alert(err);
-      });
-  };
 
   const onFinish = async (e) => {
-    console.log("check");
+    
     // e.preventDefault();
-    if(!isEdit){
+
     const newTask = {
-      sprint,
-      useCaseId,
-      taskDescription,
-      assignee,
-      anyOtherConcerns,
+      sprint:sprint,
+      useCaseId:useCaseId,
+      taskDescription:taskDescription,
+      assignee:assignee,
+      anyOtherConcerns:anyOtherConcerns,
     };
 
-    await axios
-      .post("http://localhost:5000/task/createTasks", newTask)
-      .then(() => {
-        alert("item added to task entry");
+     //api end point
+     if(session != null){
+      axios.put('http://localhost:3001/task/updateTasks/'+session,newTask).then((res)=>{
+        res.status == 200  ? message.success("Client Deleted Success") :message.success("Something Went wrong")
+        window.location = "/task"
+      }).catch((err)=>{
+        message.error("Virtuza Server Error "+err)
       })
-      .catch((err) => {
-        alert(err);
-      });
-    }else{
-      // const updateTask = {
-      //   sprint,
-      //   useCaseId,
-      //   taskDescription,
-      //   assignee,
-      //   anyOtherConcerns,
-      // };
-
-      // await axios
-      // .post("http://localhost:5000/task/updateTasks", updateTask)
-      // .then(() => {
-      //   alert("item added to task entry");
-      // })
-      // .catch((err) => {
-      //   alert(err);
-      // });
-    }
+  }
+  else{
+    axios.post('http://localhost:3001/task/createTasks',newTask).then((res)=>{
+        res.status == 201  ? message.success("Client Created Success") :message.success("Something Went wrong") 
+        window.location = "/task"
+    }).catch((err)=>{
+        message.error("Virtuza Server Error "+err)
+    })
+  }
   };
   return (
     <div className="App" style={{ paddingTop: "10px" }}>
@@ -257,12 +96,12 @@ function Task() {
         <h1>Task Entry</h1>
       </div>
       <div>
-        <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+      <Button type="primary" style={{ position: "relative", left: '44%' }} onClick={showDrawer} icon={<PlusOutlined />}>
           New Task
         </Button>
       </div>
       <Drawer
-        title={isEdit ? 'Update a Task Entry' : 'Create a New Task Entry'}
+        title='Create a New Payment Entry'
         width={720}
         onClose={onClose}
         open={open}
@@ -295,18 +134,14 @@ function Task() {
                     message: "Please enter Sprint Number",
                   },
                 ]}
-                
-              
-               
               >
-                <Input   />
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name="useCaseId"
                 label="use Case Number"
-                // onFieldChange={setUseCaseId}
                 rules={[
                   {
                     required: true,
@@ -318,7 +153,6 @@ function Task() {
                   style={{
                     width: "100%",
                   }}
-                 
                 />
               </Form.Item>
             </Col>
@@ -335,8 +169,7 @@ function Task() {
                   },
                 ]}
               >
-                <Input  />
-              
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -366,42 +199,26 @@ function Task() {
                 label="Description about the task (not madatory)"
                 rules={[
                   {
-                    
                     message: "please enter  description",
                   },
                 ]}
               >
-                <Input.TextArea
-                  rows={4}
-                 
-                />
+                <Input.TextArea rows={4} />
               </Form.Item>
             </Col>
           </Row>
           <Form.Item>
-            <Space>
-              {!isEdit ? ( <Button type="primary" htmlType="submit">
+          <Space>
+              <Button type="primary" htmlType="submit">
                 Submit
-              </Button>) :( <Button type="primary" htmlType="submit" onClick={()=>updateData()}>
-                Update
-              </Button>)}
-             
+              </Button>
             </Space>
           </Form.Item>
         </Form>
       </Drawer>
-      <div style={{ margin: "10px" }}>
-        <Table columns={columns} dataSource={tasks} />
-      </div>
-
-      {/* <Modal
-        title="Delete Confirmation"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <h3>Are you sure to delete this record</h3>
-      </Modal> */}
+     <TaskList handleClick={showDrawer}/>
+ 
+    
     </div>
   );
 }
